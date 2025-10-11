@@ -73,39 +73,59 @@ def apply_custom_css():
 
         /* ===== HEADERS ===== */
         h1 {{
-            color: {BITCOIN_ORANGE};
+            color: {BITCOIN_ORANGE} !important;
             font-weight: 600;
             text-align: center;
             margin-bottom: 0.5rem;
         }}
 
         h2, h3 {{
-            color: {SECONDARY_TEXT_COLOR};
+            color: {SECONDARY_TEXT_COLOR} !important;
+        }}
+
+        /* ===== ALL TEXT ELEMENTS ===== */
+        .stMarkdown, p, span, label, div {{
+            color: {SECONDARY_TEXT_COLOR} !important;
+        }}
+
+        /* ===== INPUT LABELS ===== */
+        .stNumberInput label, .stSelectbox label, .stRadio label {{
+            color: {SECONDARY_TEXT_COLOR} !important;
+            font-weight: 500;
         }}
 
         /* ===== METRIC CONTAINERS ===== */
         [data-testid="stMetricValue"] {{
-            color: {BITCOIN_ORANGE};
+            color: {BITCOIN_ORANGE} !important;
             font-weight: 600;
         }}
 
         [data-testid="stMetricLabel"] {{
-            color: {SECONDARY_TEXT_COLOR};
+            color: {SECONDARY_TEXT_COLOR} !important;
+        }}
+
+        [data-testid="stMetricDelta"] {{
+            color: {SECONDARY_TEXT_COLOR} !important;
         }}
 
         /* ===== INPUT WIDGETS ===== */
         .stNumberInput > div > div > input {{
             border-color: {BITCOIN_ORANGE};
+            color: {SECONDARY_TEXT_COLOR} !important;
         }}
 
         .stSelectbox > div > div {{
             border-color: {BITCOIN_ORANGE};
         }}
 
+        .stSelectbox div[data-baseweb="select"] {{
+            color: {SECONDARY_TEXT_COLOR} !important;
+        }}
+
         /* ===== BUTTONS ===== */
         .stButton > button {{
             background-color: {BITCOIN_ORANGE};
-            color: white;
+            color: white !important;
             border: none;
             border-radius: 4px;
             padding: 10px 24px;
@@ -129,10 +149,18 @@ def apply_custom_css():
             border-left: 4px solid {BITCOIN_ORANGE};
         }}
 
+        .stAlert p, .stAlert span, .stAlert div {{
+            color: {SECONDARY_TEXT_COLOR} !important;
+        }}
+
         /* ===== RADIO BUTTONS ===== */
         .stRadio > label {{
-            color: {SECONDARY_TEXT_COLOR};
+            color: {SECONDARY_TEXT_COLOR} !important;
             font-weight: 500;
+        }}
+
+        .stRadio div[role="radiogroup"] label {{
+            color: {SECONDARY_TEXT_COLOR} !important;
         }}
 
         /* ===== REMOVE EXTRA PADDING ===== */

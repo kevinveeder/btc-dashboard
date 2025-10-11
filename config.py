@@ -30,7 +30,7 @@ CACHE_TTL = 3600
 MIN_YEAR = 2010
 
 # Maximum year for future projections
-MAX_YEAR = 2040
+MAX_YEAR = 2050
 
 # Current year (auto-calculated)
 CURRENT_YEAR = datetime.now().year

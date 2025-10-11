@@ -12,6 +12,7 @@ import requests
 import streamlit as st
 from datetime import datetime
 from config import COINGECKO_API_BASE_URL, API_TIMEOUT
+from historical_prices import get_fallback_price
 
 
 # ============================================================================
@@ -68,7 +69,7 @@ def get_historical_btc_price(year, month):
     """
     Fetch historical Bitcoin price for a specific month and year
 
-    Uses CoinGecko's market_chart/range endpoint to get historical price data.
+    Uses CoinGecko's market_chart endpoint with days parameter (free tier friendly).
     Fetches the price for the first day of the specified month.
 
     Args:
@@ -84,20 +85,31 @@ def get_historical_btc_price(year, month):
     """
     try:
         # Create date for the first day of the specified month
-        date_str = f"{year}-{month:02d}-01"
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        date_obj = datetime(year, month, 1)
+        now = datetime.now()
 
-        # Convert to Unix timestamp (required by CoinGecko API)
-        timestamp_start = int(date_obj.timestamp())
-        timestamp_end = timestamp_start + 86400  # Add 24 hours (1 day in seconds)
+        # Calculate days from the target date to now
+        days_diff = (now - date_obj).days
 
-        # Construct API endpoint for historical data
-        url = f"{COINGECKO_API_BASE_URL}/coins/bitcoin/market_chart/range"
-        params = {
-            'vs_currency': 'usd',
-            'from': timestamp_start,
-            'to': timestamp_end
-        }
+        # CoinGecko free tier limits: max 365 days for detailed data
+        # For dates beyond 365 days, use max available and find closest match
+        if days_diff < 1:
+            # For current month, use current price
+            return get_current_btc_price()
+        elif days_diff > 365:
+            # Use 'max' for all historical data (daily granularity)
+            url = f"{COINGECKO_API_BASE_URL}/coins/bitcoin/market_chart"
+            params = {
+                'vs_currency': 'usd',
+                'days': 'max'
+            }
+        else:
+            # Within 365 days, use exact days
+            url = f"{COINGECKO_API_BASE_URL}/coins/bitcoin/market_chart"
+            params = {
+                'vs_currency': 'usd',
+                'days': days_diff
+            }
 
         # Make API request
         response = requests.get(url, params=params, timeout=API_TIMEOUT)
@@ -109,20 +121,35 @@ def get_historical_btc_price(year, month):
         # Extract price from response
         # Response format: {'prices': [[timestamp, price], ...]}
         if 'prices' in data and len(data['prices']) > 0:
-            return data['prices'][0][1]  # Return first price in the range
+            # Convert target date to timestamp
+            target_timestamp = int(date_obj.timestamp() * 1000)  # milliseconds
+
+            # Find the closest price to the target date
+            closest_price = None
+            min_diff = float('inf')
+
+            for price_point in data['prices']:
+                timestamp, price = price_point
+                diff = abs(timestamp - target_timestamp)
+                if diff < min_diff:
+                    min_diff = diff
+                    closest_price = price
+
+            return closest_price if closest_price else None
         else:
             st.warning(f"No price data available for {month}/{year}")
             return None
 
     except requests.exceptions.Timeout:
-        st.error(f"Request timed out while fetching price for {month}/{year}. Please try again.")
-        return None
+        st.warning(f"API timeout for {month}/{year}. Using historical reference data.")
+        return get_fallback_price(year, month)
     except requests.exceptions.RequestException as e:
-        st.error(f"Network error fetching historical price: {e}")
-        return None
+        # API failed, use fallback data
+        st.info(f"Using historical reference data for {month}/{year}.")
+        return get_fallback_price(year, month)
     except (KeyError, ValueError) as e:
-        st.error(f"Error parsing historical price data: {e}")
-        return None
+        st.warning(f"Error parsing API data for {month}/{year}. Using historical reference data.")
+        return get_fallback_price(year, month)
 
 
 # ============================================================================
