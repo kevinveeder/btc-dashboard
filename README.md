@@ -79,7 +79,11 @@ The dashboard will open in your default web browser at `http://localhost:8501`
 All settings can be adjusted in `config.py`:
 
 - `MAX_YEAR`: Maximum year for projections (default: 2050)
-- `TARGET_PRICE_2030`: Price target used to calibrate forecasting model (default: $800,000)
+- `FORECAST_ANCHORS`: Multi-year price targets for interpolation model
+  - 2030: $800,000
+  - 2040: $2,500,000
+  - 2050: $6,000,000
+- `MAX_THEORETICAL_BTC_PRICE`: Safety cap at $22M (based on Hal Finney's calculation)
 - `BITCOIN_ORANGE`: Primary theme color
 - Date ranges, BTC amount limits, and more
 
@@ -87,7 +91,11 @@ All settings can be adjusted in `config.py`:
 
 - **Current Prices**: CoinGecko API (free tier, no key required)
 - **Historical Prices**: Fallback database with monthly price points from 2010-2024
-- **Future Projections**: Exponential growth model calibrated to reach ~$800k by 2030
+- **Future Projections**: Multi-anchor point interpolation model based on expert consensus
+  - 2030: $800,000 (conservative-moderate consensus)
+  - 2040: $2,500,000 (median expert forecast)
+  - 2050: $6,000,000 (conservative expert forecast)
+  - Safety cap at $22M to prevent unrealistic projections
 
 ## Project Structure
 

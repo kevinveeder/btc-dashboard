@@ -9,9 +9,9 @@ Author: Built with Claude Code
 """
 
 from datetime import datetime
-from config import TARGET_PRICE_2030
+from config import TARGET_PRICE_2030, FORECAST_ANCHORS
 from api_handler import get_price_for_date, get_current_btc_price
-from forecasting import calculate_future_price
+from forecasting import calculate_future_price, get_model_description
 from visualization import generate_price_history_chart
 from ui_components import (
     configure_page,
@@ -160,7 +160,10 @@ def calculate_and_display_results(inputs):
 
     # Add projection info if applicable
     if is_projection:
-        results_data['projection_info'] = f"Exponential growth calibrated to ~${TARGET_PRICE_2030:,} by 2030"
+        # Use the new model description with anchor points
+        anchor_str = ", ".join([f"{year}: ${price:,}" for year, price in sorted(FORECAST_ANCHORS.items())])
+        results_data['projection_info'] = f"Multi-anchor interpolation model (Targets: {anchor_str})"
+        results_data['model_details'] = get_model_description()
 
     # ========== STEP 6: Display results ==========
     render_results_section(results_data)

@@ -57,9 +57,22 @@ BTC_DECIMAL_PLACES = 4
 # FORECASTING MODEL CONFIGURATION
 # ============================================================================
 
-# Target Bitcoin price for 2030 (used to calibrate forecasting model)
-# Modify this value to change the growth trajectory
-TARGET_PRICE_2030 = 800000
+# ANCHOR POINTS for multi-year forecasting (based on expert consensus)
+# These represent realistic price targets at specific years
+# Model interpolates between these points to avoid unrealistic exponential growth
+FORECAST_ANCHORS = {
+    2030: 800_000,       # Conservative-to-moderate expert consensus
+    2040: 2_500_000,     # Median expert forecast (range: $1M-$6M)
+    2050: 6_000_000,     # Conservative expert forecast (range: $2M-$7.5M)
+}
+
+# Legacy target for backward compatibility
+TARGET_PRICE_2030 = FORECAST_ANCHORS[2030]
+
+# Maximum theoretical Bitcoin price (safety cap)
+# Based on Hal Finney's calculation: if BTC = all global wealth ($100-300T / 21M BTC)
+# This prevents physically impossible projections
+MAX_THEORETICAL_BTC_PRICE = 22_000_000
 
 # Base year for price projections
 FORECAST_BASE_YEAR = 2024

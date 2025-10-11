@@ -385,6 +385,15 @@ def render_results_section(results_data):
     if is_projection and 'projection_info' in results_data:
         st.write(f"**Projection Model:** {results_data['projection_info']}")
 
+        # Show detailed methodology in an expander
+        if 'model_details' in results_data:
+            with st.expander("ℹ️ How are future prices calculated?"):
+                st.markdown(results_data['model_details'])
+                st.caption(
+                    "Note: Long-term projections are based on expert consensus but carry significant "
+                    "uncertainty. Actual future prices may vary substantially."
+                )
+
 
 # ============================================================================
 # FOOTER SECTION
