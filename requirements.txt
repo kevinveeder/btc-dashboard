@@ -1,0 +1,16 @@
+# Bitcoin Investment Dashboard - Requirements
+# Python 3.8+ required
+
+# Core web framework
+streamlit>=1.29.0
+
+# HTTP requests for API calls
+requests>=2.31.0
+
+# Data processing and visualization
+numpy>=1.26.0
+plotly>=5.18.0
+
+# Additional dependencies for Streamlit and Plotly
+pandas>=2.0.3
+altair<5
