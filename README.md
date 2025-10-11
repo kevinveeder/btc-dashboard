@@ -4,12 +4,30 @@ A minimalistic dashboard to calculate historical Bitcoin investment returns and 
 
 ## Features
 
-- **Historical Analysis**: Select any past date from 2010-present and see what your Bitcoin investment would be worth today
+- **Dual Input Modes**: Choose between BTC amount or USD investment amount
+  - **BTC Amount**: Analyze a specific amount of Bitcoin
+  - **USD Investment**: See how much BTC your USD would have bought at historical prices
+- **Historical Analysis**: Select any past date from 2010-present and see what your investment would be worth today
 - **Future Projections**: Forecast potential Bitcoin values up to 2050 using exponential growth models
 - **Interactive Charts**: Visualize Bitcoin price history and portfolio value over time
 - **Real-time Data**: Uses CoinGecko API for current Bitcoin prices
 - **Fallback Data**: Comprehensive historical price database for periods when API is unavailable
 - **Minimalistic Design**: Clean Bitcoin orange theme with excellent readability
+
+### Example Use Cases
+
+**Use Case 1: USD Investment**
+- Select "USD Investment" and enter $1,000
+- Choose January 2020 as purchase date
+- See that you would have bought ~0.1389 BTC at $7,200/BTC
+- View current value showing ~$15,600 (assuming ~$112k current price)
+- Profit: ~$14,600 (1,460% gain)
+
+**Use Case 2: BTC Amount**
+- Select "BTC Amount" and enter 0.5 BTC
+- Choose June 2017 as purchase date
+- See that it cost $1,250 at $2,500/BTC
+- View current value and profit/loss
 
 ## Setup
 
@@ -35,16 +53,23 @@ The dashboard will open in your default web browser at `http://localhost:8501`
 
 ## Usage
 
-1. **Enter BTC Amount**: Input the amount of Bitcoin you want to analyze (minimum 0.0001 BTC)
+1. **Choose Input Type**:
+   - **BTC Amount**: Enter a specific amount of Bitcoin you want to analyze
+   - **USD Investment**: Enter a USD amount to see how much Bitcoin you could have bought
 
-2. **Select Purchase Date**: Choose the year and month when you hypothetically purchased the Bitcoin
+2. **Enter Amount**:
+   - If BTC: Input the amount of Bitcoin (minimum 0.0001 BTC)
+   - If USD: Input the investment amount (minimum $1.00)
 
-3. **Choose Comparison Type**:
+3. **Select Purchase Date**: Choose the year and month when you hypothetically purchased the Bitcoin
+
+4. **Choose Comparison Type**:
    - **Today's Value**: See what your investment is worth right now
    - **Future Projection**: Project the value at a future date (up to 2050)
 
-4. **Calculate**: Click the button to see results including:
+5. **Calculate**: Click the button to see results including:
    - Purchase value
+   - BTC amount purchased (if using USD input)
    - Current/Projected value
    - Profit/Loss amount and percentage
    - Interactive price history chart

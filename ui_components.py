@@ -196,11 +196,13 @@ def render_page_header():
 
 def render_input_section():
     """
-    Render user input fields for BTC amount and dates
+    Render user input fields for BTC/USD amount and dates
 
     Returns:
         dict: Dictionary containing all user inputs:
-            - 'btc_amount': Amount of BTC
+            - 'input_type': "BTC Amount" or "USD Investment"
+            - 'btc_amount': Amount of BTC (if input_type is BTC)
+            - 'usd_amount': Amount of USD (if input_type is USD)
             - 'purchase_year': Purchase year
             - 'purchase_month': Purchase month
             - 'comparison_type': "Today's Value" or "Future Projection"
@@ -216,16 +218,37 @@ def render_input_section():
     with col1:
         st.subheader("Investment Details")
 
-        # BTC amount input
-        inputs['btc_amount'] = st.number_input(
-            "BTC Amount",
-            min_value=MIN_BTC_AMOUNT,
-            max_value=MAX_BTC_AMOUNT,
-            value=DEFAULT_BTC_AMOUNT,
-            step=MIN_BTC_AMOUNT,
-            format=f"%.{BTC_DECIMAL_PLACES}f",
-            help=f"Enter the amount of Bitcoin (minimum {MIN_BTC_AMOUNT} BTC)"
+        # Input type toggle (BTC or USD)
+        inputs['input_type'] = st.radio(
+            "Input Type",
+            options=["BTC Amount", "USD Investment"],
+            horizontal=True,
+            help="Choose to input BTC amount or USD investment amount"
         )
+
+        # Conditional input based on selection
+        if inputs['input_type'] == "BTC Amount":
+            inputs['btc_amount'] = st.number_input(
+                "BTC Amount",
+                min_value=MIN_BTC_AMOUNT,
+                max_value=MAX_BTC_AMOUNT,
+                value=DEFAULT_BTC_AMOUNT,
+                step=MIN_BTC_AMOUNT,
+                format=f"%.{BTC_DECIMAL_PLACES}f",
+                help=f"Enter the amount of Bitcoin (minimum {MIN_BTC_AMOUNT} BTC)"
+            )
+            inputs['usd_amount'] = None
+        else:  # USD Investment
+            inputs['usd_amount'] = st.number_input(
+                "USD Investment",
+                min_value=1.0,
+                max_value=10000000.0,
+                value=1000.0,
+                step=100.0,
+                format="%.2f",
+                help="Enter the USD amount you want to invest"
+            )
+            inputs['btc_amount'] = None
 
         # Purchase date selection
         st.write("**Purchase Date**")
@@ -294,6 +317,7 @@ def render_results_section(results_data):
 
     Args:
         results_data (dict): Dictionary containing calculation results:
+            - 'input_type': "BTC Amount" or "USD Investment"
             - 'btc_amount': Amount of BTC
             - 'purchase_price': Purchase price per BTC
             - 'purchase_value': Total purchase value
@@ -344,8 +368,15 @@ def render_results_section(results_data):
 
     # Additional details section
     st.markdown("---")
-    st.write(f"**BTC Amount:** {results_data['btc_amount']:.4f} BTC")
-    st.write(f"**Purchase Price:** ${results_data['purchase_price']:,.2f} per BTC")
+
+    # Show input type and relevant details
+    input_type = results_data.get('input_type', 'BTC Amount')
+    if input_type == "USD Investment":
+        st.write(f"**Investment Type:** USD Investment → {results_data['btc_amount']:.8f} BTC purchased")
+        st.write(f"**Purchase Price:** ${results_data['purchase_price']:,.2f} per BTC")
+    else:
+        st.write(f"**BTC Amount:** {results_data['btc_amount']:.4f} BTC")
+        st.write(f"**Purchase Price:** ${results_data['purchase_price']:,.2f} per BTC")
 
     price_label = "Projected Price" if is_projection else "Current Price"
     st.write(f"**{price_label} ({results_data['comparison_date']}):** ${results_data['current_price']:,.2f} per BTC")
