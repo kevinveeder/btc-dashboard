@@ -18,7 +18,8 @@ A minimalistic dashboard to calculate historical Bitcoin investment returns and 
 - View current value and profit/loss
 
 ### View:
-<img width="650" height="811" alt="image" src="https://github.com/user-attachments/assets/233e9cea-5fad-4042-8eab-32ae41df2d06" />
+<img width="791" height="575" alt="image" src="https://github.com/user-attachments/assets/a94b2c1d-090b-4a1e-9aac-e14407323a53" />
+
 
 
 ## Setup
