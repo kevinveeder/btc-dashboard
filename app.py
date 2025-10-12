@@ -172,7 +172,7 @@ def calculate_and_display_results(inputs):
     st.markdown("---")
 
     # Show loading spinner while generating chart
-    with st.spinner("Generating price chart..."):
+    with st.spinner("Hold tight, calculating graph..."):
         chart = generate_price_history_chart(
             purchase_year,
             purchase_month,

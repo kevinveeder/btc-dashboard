@@ -144,8 +144,7 @@ def get_historical_btc_price(year, month):
         st.warning(f"API timeout for {month}/{year}. Using historical reference data.")
         return get_fallback_price(year, month)
     except requests.exceptions.RequestException as e:
-        # API failed, use fallback data
-        st.info(f"Using historical reference data for {month}/{year}.")
+        # API failed, use fallback data (silently)
         return get_fallback_price(year, month)
     except (KeyError, ValueError) as e:
         st.warning(f"Error parsing API data for {month}/{year}. Using historical reference data.")
