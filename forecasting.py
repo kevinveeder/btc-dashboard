@@ -241,7 +241,59 @@ def calculate_future_price(target_year, target_month):
 
         projected_price = np.exp(log_target)
 
+    # Add realistic volatility for future projections
+    # Bitcoin is known for its volatility, so add some ups and downs
+    volatility_factor = add_bitcoin_volatility(target_year, target_month, projected_price)
+    projected_price *= volatility_factor
+
     return projected_price
+
+
+# ============================================================================
+# VOLATILITY MODELING
+# ============================================================================
+
+def add_bitcoin_volatility(target_year, target_month, base_price):
+    """
+    Add realistic Bitcoin-style volatility to projected prices
+
+    Creates predictable but realistic volatility patterns that simulate
+    Bitcoin's characteristic price movements - overall upward trend with
+    significant ups and downs along the way.
+
+    Args:
+        target_year (int): Target year for projection
+        target_month (int): Target month (1-12)
+        base_price (float): Base projected price before volatility
+
+    Returns:
+        float: Volatility multiplier (typically 0.7 to 1.4)
+    """
+    # Use year and month as seed for consistent volatility patterns
+    # This ensures the same date always gets the same volatility factor
+    seed_value = target_year * 100 + target_month
+
+    # Create pseudo-random but consistent volatility
+    # Using sine waves with different frequencies for realistic patterns
+    volatility_1 = np.sin(seed_value * 0.1) * 0.15  # Primary cycle
+    volatility_2 = np.sin(seed_value * 0.23) * 0.08  # Secondary cycle
+    volatility_3 = np.sin(seed_value * 0.37) * 0.05  # Tertiary cycle
+
+    # Combine volatilities and add slight upward bias (Bitcoin tends up over time)
+    total_volatility = volatility_1 + volatility_2 + volatility_3 + 0.02
+
+    # Convert to multiplier (ranges roughly from 0.75 to 1.35)
+    volatility_factor = 1.0 + total_volatility
+
+    # Add occasional "crash" and "moon" events (rare but realistic)
+    crash_seed = (target_year * 17 + target_month * 7) % 100
+    if crash_seed < 3:  # 3% chance of significant dip
+        volatility_factor *= 0.6  # 40% crash
+    elif crash_seed > 96:  # 3% chance of significant pump
+        volatility_factor *= 1.8  # 80% pump
+
+    # Ensure reasonable bounds (never more than 50% down or 100% up from base)
+    return max(0.5, min(2.0, volatility_factor))
 
 
 # ============================================================================

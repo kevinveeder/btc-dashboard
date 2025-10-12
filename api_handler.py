@@ -135,10 +135,10 @@ def get_historical_btc_price(year, month):
                     min_diff = diff
                     closest_price = price
 
-            return closest_price if closest_price else None
+            return closest_price if closest_price else get_fallback_price(year, month)
         else:
-            st.warning(f"No price data available for {month}/{year}")
-            return None
+            # No price data available, use fallback data
+            return get_fallback_price(year, month)
 
     except requests.exceptions.Timeout:
         st.warning(f"API timeout for {month}/{year}. Using historical reference data.")
@@ -183,16 +183,15 @@ def get_price_for_date(year, month, is_future=False):
     current_date = datetime.now()
     target_date = datetime(year, month, 1)
 
-    # Check if target date is in the past or present
-    if target_date <= current_date:
+    # Check if target date is in the past, present, or future
+    if target_date < current_date:
+        # Past date - use historical data
+        price = get_historical_btc_price(year, month)
+        return (price, False)
+    elif year == current_date.year and month == current_date.month:
         # Current month - get live price
-        if year == current_date.year and month == current_date.month:
-            price = get_current_btc_price()
-            return (price, False)
-        else:
-            # Historical data
-            price = get_historical_btc_price(year, month)
-            return (price, False)
+        price = get_current_btc_price()
+        return (price, False)
     else:
         # Future date - import forecasting module to avoid circular dependency
         from forecasting import calculate_future_price
