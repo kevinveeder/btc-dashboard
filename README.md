@@ -2,18 +2,6 @@
 
 A minimalistic dashboard to calculate historical Bitcoin investment returns and project future values.
 
-## Features
-
-- **Dual Input Modes**: Choose between BTC amount or USD investment amount
-  - **BTC Amount**: Analyze a specific amount of Bitcoin
-  - **USD Investment**: See how much BTC your USD would have bought at historical prices
-- **Historical Analysis**: Select any past date from 2010-present and see what your investment would be worth today
-- **Future Projections**: Forecast potential Bitcoin values up to 2050 using exponential growth models
-- **Interactive Charts**: Visualize Bitcoin price history and portfolio value over time
-- **Real-time Data**: Uses CoinGecko API for current Bitcoin prices
-- **Fallback Data**: Comprehensive historical price database for periods when API is unavailable
-- **Minimalistic Design**: Clean Bitcoin orange theme with excellent readability
-
 ### Example Use Cases
 
 **Use Case 1: USD Investment**
