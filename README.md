@@ -30,7 +30,7 @@ A minimalistic dashboard to calculate historical Bitcoin investment returns and 
 source venv/bin/activate
 ```
 
-### 2. Install Dependencies (if not already installed)
+### 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
