@@ -147,6 +147,5 @@ PROJECTION_DISCLAIMER = (
 FOOTER_TEXT = """
 <div style='text-align: center; color: #888; font-size: 0.8em;'>
 <p>Data provided by CoinGecko API | Historical data from 2010 onwards</p>
-<p>This tool is for educational purposes only and does not constitute financial advice.</p>
 </div>
 """

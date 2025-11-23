@@ -193,8 +193,7 @@ if __name__ == "__main__":
     """
     Application entry point
 
-    All forecasted Bitcoin prices are estimates based on historical trends.\n
-    Although the price of BTC is known to be volatile, the price over time has consistently shown a positive trend.\n
-    With that in mind, the creator of this dashboard will not be held liable for any losses, but he will gladly take credit for any gains. 
+    All prices are *estimates* based on historical trends and should not be taken as financial advice.\n
+    
     """
     main()

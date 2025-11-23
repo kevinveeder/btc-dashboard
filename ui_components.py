@@ -372,7 +372,7 @@ def render_results_section(results_data):
     # Show input type and relevant details
     input_type = results_data.get('input_type', 'BTC Amount')
     if input_type == "USD Investment":
-        st.write(f"**Investment Type:** USD Investment → {results_data['btc_amount']:.8f} BTC purchased")
+        st.write(f"**Investment Type:** USD Investment - {results_data['btc_amount']:.8f} BTC purchased")
         st.write(f"**Purchase Price:** ${results_data['purchase_price']:,.2f} per BTC")
     else:
         st.write(f"**BTC Amount:** {results_data['btc_amount']:.4f} BTC")
@@ -387,7 +387,7 @@ def render_results_section(results_data):
 
         # Show detailed methodology in an expander
         if 'model_details' in results_data:
-            with st.expander("ℹ️ How are future prices calculated?"):
+            with st.expander("How are future prices calculated?"):
                 st.markdown(results_data['model_details'])
                 st.caption(
                     "Note: Long-term projections are based on expert consensus but carry significant "

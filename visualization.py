@@ -58,21 +58,29 @@ def prepare_chart_data(start_year, start_month, end_year, end_month, btc_amount)
     portfolio_values = []
     has_projections = False
 
+    # Cache prices to avoid repeated calls for the same month/year
+    price_cache = {}
+
     # Generate data points
     current_date = datetime(start_year, start_month, 1)
     end_date = datetime(end_year, end_month, 1)
 
     while current_date <= end_date:
         # Fetch price for this date (historical or projected)
-        price, is_projected = get_price_for_date(current_date.year, current_date.month)
+        cache_key = (current_date.year, current_date.month)
+        if cache_key in price_cache:
+            price, is_projected = price_cache[cache_key]
+        else:
+            price, is_projected = get_price_for_date(current_date.year, current_date.month)
+            price_cache[cache_key] = (price, is_projected)
 
         if is_projected:
             has_projections = True
 
-        # Add data point
+        # Add data point; keep None instead of zero so gaps are visible if data is missing
         dates.append(current_date)
-        prices.append(price if price else 0)
-        portfolio_values.append((price * btc_amount) if price else 0)
+        prices.append(price)
+        portfolio_values.append((price * btc_amount) if price is not None else None)
 
         # Move to next sampling point (month or quarter)
         month = current_date.month + step_months

@@ -27,7 +27,7 @@ from config import FORECAST_ANCHORS, MAX_THEORETICAL_BTC_PRICE, TARGET_PRICE_203
 # ANCHOR POINT INTERPOLATION
 # ============================================================================
 
-def interpolate_price_between_anchors(current_price, target_year):
+def interpolate_price_between_anchors(current_price, target_year, target_month):
     """
     Interpolate BTC price using multi-anchor point model
 
@@ -46,20 +46,20 @@ def interpolate_price_between_anchors(current_price, target_year):
         >>> price = interpolate_price_between_anchors(100000, 2035)
         >>> print(f"2035 projection: ${price:,.2f}")
     """
-    current_year = datetime.now().year
     current_date = datetime.now()
+    current_year = current_date.year
+    target_date = datetime(target_year, target_month, 1)
 
     # Get sorted anchor years
     anchor_years = sorted(FORECAST_ANCHORS.keys())
 
     # CASE 1: Target year is at or before current year
-    if target_year <= current_year:
+    if target_date <= current_date:
         return current_price
 
     # CASE 2: Target year matches an anchor point exactly
     if target_year in FORECAST_ANCHORS:
-        # Still need to interpolate from current price to anchor
-        years_to_target = target_year - current_year
+        years_to_target = max((datetime(target_year, 1, 1) - current_date).days / 365.25, 0.0001)
         growth_rate = np.log(FORECAST_ANCHORS[target_year] / current_price) / years_to_target
         projected = current_price * np.exp(growth_rate * years_to_target)
         return min(projected, MAX_THEORETICAL_BTC_PRICE)
@@ -67,9 +67,9 @@ def interpolate_price_between_anchors(current_price, target_year):
     # CASE 3: Target year is before first anchor (e.g., 2027)
     first_anchor = anchor_years[0]
     if target_year < first_anchor:
-        # Interpolate from current price to first anchor
-        years_to_anchor = first_anchor - current_year
-        years_to_target = target_year - current_year
+        anchor_date = datetime(first_anchor, 1, 1)
+        years_to_anchor = max((anchor_date - current_date).days / 365.25, 0.0001)
+        years_to_target = max((target_date - current_date).days / 365.25, 0.0001)
 
         growth_rate = np.log(FORECAST_ANCHORS[first_anchor] / current_price) / years_to_anchor
         projected = current_price * np.exp(growth_rate * years_to_target)
@@ -82,12 +82,12 @@ def interpolate_price_between_anchors(current_price, target_year):
         second_last_anchor = anchor_years[-2]
 
         # Calculate the slower growth rate between last two anchors
-        years_between = last_anchor - second_last_anchor
+        years_between = max((last_anchor - second_last_anchor), 1)
         price_ratio = FORECAST_ANCHORS[last_anchor] / FORECAST_ANCHORS[second_last_anchor]
         growth_rate = np.log(price_ratio) / years_between
 
         # Apply this slower growth rate for years beyond last anchor
-        years_beyond = target_year - last_anchor
+        years_beyond = max((target_date - datetime(last_anchor, 1, 1)).days / 365.25, 0.0001)
         projected = FORECAST_ANCHORS[last_anchor] * np.exp(growth_rate * years_beyond)
         return min(projected, MAX_THEORETICAL_BTC_PRICE)
 
@@ -108,8 +108,10 @@ def interpolate_price_between_anchors(current_price, target_year):
         upper_price = FORECAST_ANCHORS[upper_anchor]
 
         # Calculate position between anchors (0 to 1)
-        total_years = upper_anchor - lower_anchor
-        years_from_lower = target_year - lower_anchor
+        lower_date = datetime(lower_anchor, 1, 1)
+        upper_date = datetime(upper_anchor, 1, 1)
+        total_years = max((upper_date - lower_date).days / 365.25, 0.0001)
+        years_from_lower = max((target_date - lower_date).days / 365.25, 0.0)
         position = years_from_lower / total_years
 
         # Logarithmic interpolation
@@ -219,27 +221,8 @@ def calculate_future_price(target_year, target_month):
     if years_diff < 0:
         return None
 
-    # Use new multi-anchor point interpolation model
-    projected_price = interpolate_price_between_anchors(current_price, target_year)
-
-    # Month-level adjustment (optional fine-tuning within the year)
-    # If target month is mid-year, interpolate between current year and target year
-    if target_month != 1:
-        # Get price for January of target year
-        jan_price = interpolate_price_between_anchors(current_price, target_year)
-
-        # Get price for January of next year
-        next_jan_price = interpolate_price_between_anchors(current_price, target_year + 1)
-
-        # Interpolate based on month position in the year
-        month_fraction = (target_month - 1) / 12.0
-
-        # Logarithmic interpolation for the month adjustment
-        log_jan = np.log(jan_price)
-        log_next_jan = np.log(next_jan_price)
-        log_target = log_jan + month_fraction * (log_next_jan - log_jan)
-
-        projected_price = np.exp(log_target)
+    # Use new multi-anchor point interpolation model (month-aware)
+    projected_price = interpolate_price_between_anchors(current_price, target_year, target_month)
 
     # Add realistic volatility for future projections
     # Bitcoin is known for its volatility, so add some ups and downs
@@ -293,7 +276,8 @@ def add_bitcoin_volatility(target_year, target_month, base_price):
         volatility_factor *= 1.8  # 80% pump
 
     # Ensure reasonable bounds (never more than 50% down or 100% up from base)
-    return max(0.5, min(2.0, volatility_factor))
+    # Tighter bounds to keep projections stable
+    return max(0.75, min(1.25, volatility_factor))
 
 
 # ============================================================================
